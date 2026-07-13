@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows, Float, Sparkles, MeshDistortMaterial } from '@react-three/drei';
+import { Scene3DPremium } from '@/components/ScenePremium';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -261,18 +262,11 @@ function ProjectViewer({ project, onClose }: { project: Project; onClose: () => 
         </div>
       )}
 
-      {/* 3D Scene */}
+      {/* 3D Scene PREMIUM */}
       {texture && (
-        <Canvas camera={{ position: [0, 0, 6], fov: 50 }} shadows className="absolute inset-0">
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }} shadows gl={{ antialias: true, toneMapping: 3 }} className="absolute inset-0">
           <Suspense fallback={null}>
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[5, 5, 5]} intensity={1.5} color="#8b5cf6" />
-            <pointLight position={[-5, -5, 5]} intensity={1} color="#ec4899" />
-            <PhotoShape texture={texture} shape={project.shape} />
-            <Sparkles count={50} scale={8} size={4} speed={0.3} color="#c084fc" />
-            <ContactShadows position={[0, -2, 0]} opacity={0.4} scale={12} blur={2} />
-            <Environment preset="city" />
-            <OrbitControls enableZoom enablePan={false} />
+            <Scene3DPremium texture={texture} shape={project.shape} />
           </Suspense>
         </Canvas>
       )}
