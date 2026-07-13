@@ -223,15 +223,14 @@ interface Project {
 }
 
 function ProjectViewer({ project, onClose }: { project: Project; onClose: () => void }) {
-  const textureRef = useRef<THREE.Texture | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
+    setTexture(null); // reset al cambiar de proyecto
     const loader = new THREE.TextureLoader();
     loader.load(project.image_path, (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
-      textureRef.current = tex;
-      setLoaded(true);
+      setTexture(tex);
     });
   }, [project.image_path]);
 
@@ -252,14 +251,24 @@ function ProjectViewer({ project, onClose }: { project: Project; onClose: () => 
         <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">✕</button>
       </div>
 
+      {/* Loading */}
+      {!texture && (
+        <div className="absolute inset-0 flex items-center justify-center text-white/40">
+          <div className="text-center">
+            <div className="text-5xl mb-3 animate-pulse">⏳</div>
+            <p>Cargando 3D...</p>
+          </div>
+        </div>
+      )}
+
       {/* 3D Scene */}
-      {loaded && textureRef.current && (
+      {texture && (
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }} shadows className="absolute inset-0">
           <Suspense fallback={null}>
             <ambientLight intensity={0.5} />
             <directionalLight position={[5, 5, 5]} intensity={1.5} color="#8b5cf6" />
             <pointLight position={[-5, -5, 5]} intensity={1} color="#ec4899" />
-            <PhotoShape texture={textureRef.current} shape={project.shape} />
+            <PhotoShape texture={texture} shape={project.shape} />
             <Sparkles count={50} scale={8} size={4} speed={0.3} color="#c084fc" />
             <ContactShadows position={[0, -2, 0]} opacity={0.4} scale={12} blur={2} />
             <Environment preset="city" />
